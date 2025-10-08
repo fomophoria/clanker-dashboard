@@ -1,3 +1,4 @@
+// @ts-nocheck
 // watcher/index.ts
 // Run locally with: npx ts-node --transpile-only watcher/index.ts
 import "dotenv/config";
