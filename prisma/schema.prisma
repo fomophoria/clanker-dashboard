@@ -1,0 +1,18 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // e.g. file:./burns.db
+}
+
+model Burn {
+  id           Int      @id @default(autoincrement())
+  txHash       String
+  amountHuman  Float
+  timestamp    DateTime @default(now())
+
+  @@index([timestamp])
+}

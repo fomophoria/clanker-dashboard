@@ -1,26 +1,441 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────
+   DEADLOOP — OMEGA PULSE BUILD
+   - CRT grid + stars
+   - Terminal frame with safe inner padding
+   - Guaranteed boot progress motion
+   - Reactor Burn Dial with Buyback Pulse
+   - Bulletproof ticker (viewport + track; JS sets CSS vars)
+───────────────────────────────────────────────────────────── */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --dl-bg: #000;
+  --dl-green: #22ff00;
+  --dl-cyan: #00ccff;
+  --dl-red: #ff0044;
+  --dl-yellow: #ffee00;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html,
+body {
+  height: 100%;
+  background: var(--dl-bg);
+  color: var(--dl-green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: .02em;
+  overflow-x: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+::selection {
+  background: rgba(34, 255, 0, .28);
+  color: #eaffea
+}
+
+/* Scene layers */
+.scene {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden
+}
+
+.bgGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% -10%, rgba(255, 0, 80, .08), transparent 55%),
+    repeating-linear-gradient(0deg, rgba(34, 255, 120, .07) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(34, 255, 120, .05) 0 1px, transparent 1px 40px);
+  filter: saturate(110%);
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  background-image:
+    radial-gradient(2px 2px at 20px 30px, #fff, transparent 60%),
+    radial-gradient(1px 1px at 130px 80px, #cffff1, transparent 60%),
+    radial-gradient(1px 1px at 260px 140px, #eaffff, transparent 60%);
+  background-size: 160px 160px, 220px 220px, 260px 260px;
+  animation: stars 160s linear infinite;
+}
+
+@keyframes stars {
+  from {
+    background-position: 0 0
+  }
+
+  to {
+    background-position: -1200px 800px
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* CRT scan + vignette */
+.crt::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  background:
+    repeating-linear-gradient(transparent, transparent 1.5px, rgba(0, 255, 110, .06) 2.5px),
+    radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 62%, rgba(0, 0, 0, .55) 100%);
+  mix-blend-mode: overlay;
+}
+
+/* Terminal frame */
+.frame {
+  border: 2px solid var(--dl-green);
+  background: rgba(0, 0, 0, .92);
+  box-shadow: 0 0 18px 2px rgba(0, 255, 120, .35),
+    inset 0 0 22px rgba(0, 255, 90, .08),
+    0 0 90px -10px rgba(255, 0, 80, .35);
+  position: relative;
+}
+
+.corn {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: var(--dl-green)
+}
+
+.c-tl {
+  top: -2px;
+  left: -2px;
+  border-top: 2px solid;
+  border-left: 2px solid
+}
+
+.c-tr {
+  top: -2px;
+  right: -2px;
+  border-top: 2px solid;
+  border-right: 2px solid
+}
+
+.c-bl {
+  bottom: -2px;
+  left: -2px;
+  border-bottom: 2px solid;
+  border-left: 2px solid
+}
+
+.c-br {
+  bottom: -2px;
+  right: -2px;
+  border-bottom: 2px solid;
+  border-right: 2px solid
+}
+
+.frame-body {
+  padding: 2rem 2.25rem
+}
+
+@media (min-width:640px) {
+  .frame-body {
+    padding: 2.5rem 2.75rem
+  }
+}
+
+/* Terminal text fx */
+.terminal {
+  text-shadow: 0 0 2px var(--dl-green), 0 0 6px var(--dl-green), 0 0 12px rgba(0, 255, 136, .7)
+}
+
+.cursor {
+  animation: blink 1s steps(1) infinite
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1
+  }
+
+  50% {
+    opacity: 0
+  }
+}
+
+/* Glitch headline */
+.glitch {
+  position: relative
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none
+}
+
+.glitch::before {
+  text-shadow: -1px 0 var(--dl-red);
+  animation: gx 2.2s infinite linear alternate
+}
+
+.glitch::after {
+  text-shadow: 1px 0 var(--dl-cyan);
+  animation: gy 1.9s infinite linear alternate
+}
+
+@keyframes gx {
+  0% {
+    transform: translate(0)
+  }
+
+  25% {
+    transform: translate(1px)
+  }
+
+  50% {
+    transform: translate(-1px)
+  }
+
+  75% {
+    transform: translate(2px)
+  }
+
+  100% {
+    transform: translate(0)
+  }
+}
+
+@keyframes gy {
+  0% {
+    transform: translateY(0)
+  }
+
+  50% {
+    transform: translateY(1px)
+  }
+
+  100% {
+    transform: translateY(0)
+  }
+}
+
+/* Boot progress (guaranteed movement) */
+.boot {
+  position: relative;
+  height: 8px;
+  border: 1px solid rgba(0, 255, 120, .25);
+  background: rgba(0, 255, 120, .12);
+  overflow: hidden
+}
+
+.boot .fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, #5aff5a, #caffca);
+  box-shadow: 0 0 12px #0f0;
+  animation: bootWidth 2.1s ease-in-out infinite alternate;
+}
+
+.boot::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -25%;
+  width: 28%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent);
+  animation: bootSweep 1.4s linear infinite;
+}
+
+@keyframes bootWidth {
+  0% {
+    width: 15%
+  }
+
+  100% {
+    width: 92%
+  }
+}
+
+@keyframes bootSweep {
+  0% {
+    left: -25%
+  }
+
+  100% {
+    left: 110%
+  }
+}
+
+/* dial container: clip overspill so it won't cover the block below */
+.burn-dial {
+  --size: 320px;
+  width: var(--size);
+  height: var(--size);
+  position: relative;
+  border-radius: 50%;
+  isolation: isolate;
+  /* was overflow: visible; */
+  overflow: hidden;
+  /* ⬅ clip outer glow/marker */
+  display: grid;
+  place-items: center;
+  filter: saturate(115%);
+}
+
+/* lit arc (put under readout) + make inner hole larger so text never gets hit */
+.dial-ring {
+  --pct: 0;
+  position: absolute;
+  inset: 6%;
+  z-index: 1;
+  /* ⬅ below text */
+  border-radius: 50%;
+  background:
+    conic-gradient(from -90deg,
+      #22ff00 calc(var(--pct)*1%),
+      rgba(34, 255, 0, .08) calc(var(--pct)*1%));
+  /* inner hole: make it wider (was 58/59) */
+  mask: radial-gradient(circle at 50% 50%, transparent 62%, black 63%);
+  -webkit-mask: radial-gradient(circle at 50% 50%, transparent 62%, black 63%);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, .7);
+}
+
+/* chevrons + marker under text as well */
+.dial-chevrons {
+  z-index: 1;
+}
+
+.dial-marker {
+  z-index: 1;
+}
+
+/* readout always on top */
+.dial-readout {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  /* ⬅ above everything */
+  display: grid;
+  place-items: center;
+  pointer-events: none
+}
+
+
+/* pulse effect on buyback */
+.burn-dial.pulse .dial-marker::before {
+  animation: marker-pop .45s ease-out 1;
+}
+
+.burn-dial.pulse .dial-chevrons {
+  animation-duration: 6s;
+  /* speed up briefly */
+}
+
+.burn-dial .dial-hit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+.burn-dial.pulse .dial-hit {
+  animation: ripple .55s ease-out 1;
+}
+
+@keyframes marker-pop {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translate(calc((var(--size)/2) - 22px));
+    box-shadow: 0 0 10px #ffee66, 0 0 26px rgba(255, 238, 102, .7)
+  }
+
+  50% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translate(calc((var(--size)/2) - 18px));
+    box-shadow: 0 0 22px #ffee66, 0 0 50px rgba(255, 238, 102, .9)
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translate(calc((var(--size)/2) - 22px));
+  }
+}
+
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 255, 0, .35), 0 0 0 8px rgba(34, 255, 0, .22), 0 0 0 16px rgba(34, 255, 0, .08)
+  }
+
+  100% {
+    box-shadow: 0 0 0 12px rgba(34, 255, 0, 0), 0 0 0 24px rgba(34, 255, 0, 0), 0 0 0 40px rgba(34, 255, 0, 0)
+  }
+}
+
+/* readout */
+.dial-readout {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none
+}
+
+.dial-readout .pct {
+  font-size: 2rem;
+  text-shadow: 0 0 6px #22ff00, 0 0 14px #22ff00
+}
+
+.dial-readout .label {
+  margin-top: .25rem;
+  font-size: .72rem;
+  letter-spacing: .35em;
+  color: #dffff0
+}
+
+/* Ticker (viewport + track; distance & speed set from JS) */
+.ticker {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  height: 30px;
+  background: rgba(0, 0, 0, .9);
+  border-top: 1px solid rgba(34, 255, 0, .3);
+  box-shadow: 0 0 10px rgba(0, 255, 120, .2) inset
+}
+
+.t-viewport {
+  width: 100%;
+  overflow: hidden
+}
+
+.t-track {
+  display: flex;
+  gap: 40px;
+  white-space: nowrap;
+  will-change: transform;
+  --marquee-width: 100%;
+  --marquee-time: 30s;
+  animation: marquee var(--marquee-time) linear infinite;
+}
+
+.t-item {
+  padding: 0 .9rem;
+  color: #aaffb3;
+  text-shadow: 0 0 2px var(--dl-green)
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0)
+  }
+
+  to {
+    transform: translateX(calc(-1 * var(--marquee-width)))
+  }
 }
