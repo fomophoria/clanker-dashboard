@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "watcher": "ts-node --transpile-only watcher/index.ts",
+    "watcher": "ts-node --transpile-only watcher/worker.ts",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"

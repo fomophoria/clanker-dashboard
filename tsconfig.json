@@ -17,15 +17,21 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
-    "next-env.d.ts",
     "app/**/*",
     "components/**/*",
     "lib/**/*",
+    "middleware.ts",
+    "next-env.d.ts",
     "shared/**/*",
-    "middleware.ts"
+    ".next/types/**/*.ts"
   ],
   "exclude": [
     "watcher/**/*", // ⛔ keep watcher out of Vercel type-check
