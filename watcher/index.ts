@@ -53,7 +53,7 @@ const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const toHuman = (raw: bigint) => Number(ethers.formatUnits(raw, TOKEN_DECIMALS));
 
 async function burnAmount(value: bigint) {
-  const human = toHuman(value);
+  const human = toHuman(value); // <-- number
 
   if (human < MIN_TOKEN_TO_ACT) {
     console.log(`Skip (below threshold). Amount=${human} MIN=${MIN_TOKEN_TO_ACT}`);
@@ -66,10 +66,11 @@ async function burnAmount(value: bigint) {
   console.log(`🔥 Burn submitted: ${human} tokens → ${DEAD_ADDRESS} | tx=${tx.hash}`);
   await tx.wait();
 
+  // IMPORTANT: amountHuman expects a number; send `human` (not string)
   await prisma.burn.create({
     data: {
       txHash: tx.hash,
-      amountHuman: human.toString(),
+      amountHuman: human, // <-- number, fixes the build error
     },
   });
 
