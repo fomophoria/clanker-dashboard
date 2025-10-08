@@ -1,0 +1,8 @@
+# exclude the background worker from Vercel upload/build
+watcher/**
+
+# misc things we never need on Vercel
+*.db
+prisma/*.db
+.data/**
+README-local.md
