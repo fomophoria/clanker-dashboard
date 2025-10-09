@@ -266,6 +266,8 @@ body {
   padding: 0 .9rem;
   color: #aaffb3;
   text-shadow: 0 0 2px var(--dl-green);
+  white-space: nowrap;
+  /* Prevent text wrapping */
 }
 
 @keyframes marquee {

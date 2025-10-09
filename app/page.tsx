@@ -222,7 +222,7 @@ function DegenBootStream({ speed = 48 }: { speed?: number }) {
 }
 
 /* ─────────────────────────────────────────────
-   System Breach (restored)
+   System Breach
 ───────────────────────────────────────────── */
 type Attempt = { keyId: string; id: string; text: string; status: "fail" | "pass" };
 const PROTOCOLS = ["BURN-X1", "ROGUE-A3", "PURGE-Z9", "BURN-K5", "ROGUE-D7", "PURGE-Y2", "BURN-M9", "ROGUE-B4", "PURGE-X6"];
@@ -336,8 +336,6 @@ function SystemBreach({
 /* ─────────────────────────────────────────────
    Tiny UI helpers
 ───────────────────────────────────────────── */
-
-// Flip/slide for numbers
 function FlipText({ value, className }: { value: string; className?: string }) {
   return (
     <motion.span
@@ -353,7 +351,6 @@ function FlipText({ value, className }: { value: string; className?: string }) {
   );
 }
 
-// Ember particles on dial pulse
 function Embers({ n = 4 }: { n?: number }) {
   const seeds = useMemo(() => Array.from({ length: n }, () => Math.random()), [n]);
   return (
@@ -382,7 +379,6 @@ export default function Page() {
   const [gate, setGate] = useState(true);
   const [ready, setReady] = useState(false);
   const [headline, setHeadline] = useState("");
-  const [burnMode, setBurnMode] = useState(false);
 
   const [burnPct, setBurnPct] = useState(0);
   const [supply, setSupply] = useState(Number(process.env.NEXT_PUBLIC_TOTAL_SUPPLY || "1000000000"));
@@ -393,11 +389,10 @@ export default function Page() {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const blockRef = useRef<HTMLDivElement | null>(null);
 
-  // keyboard: enter + burn-mode toggle
+  // keyboard: enter
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (gate && ready && e.key === "Enter") enter();
-      if (e.key.toLowerCase() === "b") setBurnMode((v) => !v);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -469,11 +464,17 @@ export default function Page() {
     Array.isArray(recent) ? recent : recent?.items || [];
 
   return (
-    <main className={`scene ${burnMode ? "burn-mode" : ""}`}>
-      {/* CRT vignette / curvature */}
+    <main className="scene">
+      {/* CRT overlay sits beneath content */}
       <div className="crt-overlay" aria-hidden />
+
+      {/* Backgrounds (beneath halo) */}
       <div className="bgGrid" />
       <div className="stars" />
+
+      {/* Burning red halo (above backgrounds, below content) */}
+      <div className="burn-halo" aria-hidden />
+
       <AnimatePresence mode="wait">
         {gate ? (
           <motion.section
@@ -547,7 +548,7 @@ export default function Page() {
                   </h2>
                 </div>
 
-                {/* Deadloop code blurb (under the title) */}
+                {/* Deadloop code blurb */}
                 <div className="mb-4">
                   <pre className="terminal neoncode neoncode-lg" aria-label="What is Deadloop Protocol">{`WHAT IS DEADLOOP?
 // The first automated native-fee burn protocol launched on Clanker
@@ -578,8 +579,6 @@ tx_in => supply_out => price_up
                   {headline}
                   <span className="cursor">█</span>
                 </div>
-
-
 
                 {/* Dashboard grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -632,11 +631,12 @@ tx_in => supply_out => price_up
                   {/* Full width: recent burns */}
                   <div className="section md:col-span-3 text-xs overflow-hidden">
                     <div className="text-[#22ff00] mb-1 softglow">LIVE CLAIMS & TOKEN BURNS</div>
-                    <div className="h-[180px] overflow-y-auto pr-2">
+                    {/* scrollbar removed: keep static height */}
+                    <div className="h-[180px] pr-2">
                       {!recentList || recentList.length === 0 ? (
                         <div className="text-[#aaffb3]/70">awaiting claims…</div>
                       ) : (
-                        recentList.map((t, i) => (
+                        recentList.slice(0, 10).map((t, i) => (
                           <div key={`${t.txHash}-${i}`} className="flex justify-between gap-3">
                             <span className="text-[#b8ffd0] truncate">{t.txHash}</span>
                             <span className="text-[#aaffb3] whitespace-nowrap">
@@ -722,101 +722,151 @@ tx_in => supply_out => price_up
 
       {/* Global CSS for the upgrades */}
       <style jsx global>{`
-        /* CRT & vignette */
-        .crt-overlay {
-          position: fixed;
-          inset: 0;
-          pointer-events: none;
-          background:
-            radial-gradient(120% 80% at 50% 20%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.25) 70%, rgba(0, 0, 0, 0.55) 100%),
-            repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 2px, transparent 4px);
-          mix-blend-mode: overlay;
-          z-index: 0;
-        }
-        .scene { position: relative; z-index: 1; }
+  /* Allow scrolling but hide scrollbars */
+  html, body { height: 100%; overflow: auto; }
+  body {
+    -ms-overflow-style: none;      /* IE/Edge */
+    scrollbar-width: none;         /* Firefox */
+  }
+  body::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
 
-        /* Border shimmer */
-        .terminal-box, .section { position: relative; overflow: hidden; }
-        .terminal-box::before, .section::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: linear-gradient(120deg, transparent, rgba(34, 255, 0, 0.08), transparent);
-          background-size: 200% 200%;
-          animation: borderShimmer 14s linear infinite;
-          mix-blend-mode: screen;
-        }
-        @keyframes borderShimmer {
-          0% { background-position: 0% 0%; }
-          50% { background-position: 100% 100%; }
-          100% { background-position: 0% 0%; }
-        }
+  .scene {
+    position: relative;
+    z-index: 3;
+    min-height: 100vh;
+    overflow: visible;             /* don't clip content */
+  }
 
-        .softglow { text-shadow: 0 0 6px rgba(34, 255, 0, 0.6); }
+  /* CRT & vignette */
+  .crt-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 80% at 50% 20%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.25) 70%, rgba(0, 0, 0, 0.55) 100%),
+      repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 1px, transparent 2px, transparent 4px);
+    mix-blend-mode: overlay;
+    z-index: 0;
+  }
 
-        /* Log coloring */
-        .logline.burn .logtag, .logburn { color: #9cff8d; filter: drop-shadow(0 0 4px rgba(156,255,141,0.4)); }
-        .logline.warn .logtag, .logwarn { color: #ffcc66; }
-        .logline.tx .logtag, .logok { color: #b5ffd2; }
+  /* Background layers (below halo) */
+  .bgGrid, .stars { position: fixed; z-index: 1; }
 
-        .copytoast {
-          position: absolute;
-          right: 8px;
-          top: 8px;
-          background: rgba(5, 20, 5, 0.7);
-          border: 1px solid rgba(34, 255, 0, 0.35);
-          padding: 2px 8px;
-          border-radius: 4px;
-          font-size: 12px;
-        }
-        .loghash.copy { cursor: pointer; text-decoration: underline dotted; }
+  /* ALWAYS-ON burning halo (above backgrounds) */
+  .burn-halo {
+    position: fixed;
+    inset: -12vh;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.42;
+    background:
+      radial-gradient(60% 40% at 50% 88%,
+        rgba(255, 60, 60, 0.00) 0%,
+        rgba(255, 48, 48, 0.10) 32%,
+        rgba(255, 30, 30, 0.18) 55%,
+        rgba(255, 0, 0, 0.00) 72%),
+      radial-gradient(70% 55% at 50% 92%,
+        rgba(255, 140, 90, 0.08), transparent 70%);
+    mix-blend-mode: screen;
+    filter: blur(14px);
+    transform: translateZ(0);
+    animation: burnPulse 3.6s ease-in-out infinite, burnFlicker 780ms steps(2, end) infinite;
+  }
+  @keyframes burnPulse {
+    0%, 100% { opacity: 0.32; filter: blur(12px) hue-rotate(-6deg); }
+    50%      { opacity: 0.58; filter: blur(20px) hue-rotate(-14deg); }
+  }
+  @keyframes burnFlicker {
+    0%   { filter: brightness(1) drop-shadow(0 0 0 rgba(255,80,80,0)); }
+    50%  { filter: brightness(1.06) drop-shadow(0 0 10px rgba(255,80,80,0.10)); }
+    100% { filter: brightness(1) drop-shadow(0 0 0 rgba(255,80,80,0)); }
+  }
 
-        /* Dial embers */
-        .burn-dial { position: relative; }
-        .ember {
-          position: absolute;
-          bottom: 24%;
-          left: 0;
-          width: 3px;
-          height: 3px;
-          border-radius: 50%;
-          background: var(--ember, #22ff88);
-          box-shadow: 0 0 8px rgba(34, 255, 136, 0.8);
-          pointer-events: none;
-        }
+  /* Border shimmer */
+  .terminal-box, .section { position: relative; overflow: hidden; }
+  .terminal-box::before, .section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(120deg, transparent, rgba(34, 255, 0, 0.08), transparent);
+    background-size: 200% 200%;
+    animation: borderShimmer 14s linear infinite;
+    mix-blend-mode: screen;
+  }
+  @keyframes borderShimmer {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+  }
 
-        /* Ticker shimmer */
-        .t-track { position: relative; }
-        .ticker-sheen {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-          transform: translateX(-100%);
-          animation: sheen 4.2s linear infinite;
-        }
-        @keyframes sheen {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .shimmer { mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%); }
+  .softglow { text-shadow: 0 0 6px rgba(34, 255, 0, 0.6); }
 
-        /* Burn mode theme */
-        .scene .text-accent { color: #ff0044; }
-        .burn-mode .softglow { text-shadow: 0 0 8px rgba(255, 64, 84, 0.7); }
-        .burn-mode .glow-text { color: #ffd0d6; text-shadow: 0 0 6px #ffd0d6, 0 0 12px #ff6688, 0 0 24px #ff2255; }
-        .burn-mode .ticker-sheen { background: linear-gradient(90deg, transparent, rgba(255, 100, 120, 0.08), transparent); }
+  /* Log coloring */
+  .logline.burn .logtag, .logburn { color: #9cff8d; filter: drop-shadow(0 0 4px rgba(156,255,141,0.4)); }
+  .logline.warn .logtag, .logwarn { color: #ffcc66; }
+  .logline.tx .logtag, .logok { color: #b5ffd2; }
 
-        @media (prefers-reduced-motion: reduce) {
-          .ticker-sheen, .terminal-box::before, .section::before { animation: none !important; }
-        }
-        
-        /* size modifiers for the code panel */
-.neoncode-lg { font-size: 16px; line-height: 1.45; }
-.neoncode-xl { font-size: 18px; line-height: 1.5; }
-}
-      `}</style>
+  .copytoast {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: rgba(5, 20, 5, 0.7);
+    border: 1px solid rgba(34, 255, 0, 0.35);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+  .loghash.copy { cursor: pointer; text-decoration: underline dotted; }
+
+  /* Dial embers */
+  .burn-dial { position: relative; }
+  .ember {
+    position: absolute;
+    bottom: 24%;
+    left: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--ember, #22ff88);
+    box-shadow: 0 0 8px rgba(34, 255, 136, 0.8);
+    pointer-events: none;
+  }
+
+  /* Ticker: seamless loop */
+  .t-viewport { overflow: hidden; }
+  .t-track {
+    display: inline-flex;
+    will-change: transform;
+    animation: marquee var(--marquee-time, 24s) linear infinite;
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-1 * var(--marquee-width, 1000px))); }
+  }
+
+  .ticker-sheen {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    transform: translateX(-100%);
+    animation: sheen 4.2s linear infinite;
+  }
+  @keyframes sheen {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+  .shimmer { mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 88%, transparent 100%); }
+
+  /* Accent helpers */
+  .scene .text-accent { color: #ff0044; }
+  .glow-text { color: #ffd0d6; text-shadow: 0 0 6px #ffd0d6, 0 0 12px #ff6688, 0 0 24px #ff2255; }
+
+  /* Size modifiers for the code panel */
+  .neoncode-lg { font-size: 16px; line-height: 1.45; }
+  .neoncode-xl { font-size: 18px; line-height: 1.5; }
+`}</style>
     </main>
   );
 }
