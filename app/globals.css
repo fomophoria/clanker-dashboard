@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────────────────
-   DEADLOOP — OMEGA PULSE BUILD
-   - CRT grid + stars
-   - Terminal frame with safe inner padding
-   - Guaranteed boot progress motion
-   - Reactor Burn Dial with Buyback Pulse
-   - Bulletproof ticker (viewport + track; JS sets CSS vars)
+   DEADLOOP — TERMINAL LANDER (degen build)
+   - CRT, stars, terminal box
+   - Degen boot stream
+   - 10s Entry Gate (auth attempts, red→green bar)
+   - Glitch + warning FX, screen shake
+   - Dashboard + ticker
 ───────────────────────────────────────────────────────────── */
 
 :root {
@@ -17,6 +17,9 @@
   --dl-cyan: #00ccff;
   --dl-red: #ff0044;
   --dl-yellow: #ffee00;
+
+  --terminal-width: 1040px;
+  --terminal-height: 620px;
 }
 
 html,
@@ -31,14 +34,14 @@ body {
 
 ::selection {
   background: rgba(34, 255, 0, .28);
-  color: #eaffea
+  color: #eaffea;
 }
 
-/* Scene layers */
+/* Layers */
 .scene {
   position: relative;
   min-height: 100vh;
-  overflow: hidden
+  overflow: hidden;
 }
 
 .bgGrid {
@@ -67,15 +70,15 @@ body {
 
 @keyframes stars {
   from {
-    background-position: 0 0
+    background-position: 0 0;
   }
 
   to {
-    background-position: -1200px 800px
+    background-position: -1200px 800px;
   }
 }
 
-/* CRT scan + vignette */
+/* CRT */
 .crt::after {
   content: "";
   position: fixed;
@@ -88,85 +91,92 @@ body {
   mix-blend-mode: overlay;
 }
 
-/* Terminal frame */
-.frame {
+/* Terminal box */
+.terminal-box {
+  width: min(var(--terminal-width), 92vw);
+  min-height: var(--terminal-height);
+  margin: 6vh auto;
   border: 2px solid var(--dl-green);
   background: rgba(0, 0, 0, .92);
-  box-shadow: 0 0 18px 2px rgba(0, 255, 120, .35),
+  box-shadow:
+    0 0 18px 2px rgba(0, 255, 120, .35),
     inset 0 0 22px rgba(0, 255, 90, .08),
     0 0 90px -10px rgba(255, 0, 80, .35);
+  border-radius: 10px;
   position: relative;
+  overflow: hidden;
+  padding: clamp(1.5rem, 2.5vw, 2.75rem);
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.terminal-box .frame-body {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .corn {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  border-color: var(--dl-green)
+  width: 22px;
+  height: 22px;
+  border-color: var(--dl-green);
+  opacity: .5;
 }
 
 .c-tl {
-  top: -2px;
-  left: -2px;
+  top: 6px;
+  left: 6px;
   border-top: 2px solid;
-  border-left: 2px solid
+  border-left: 2px solid;
 }
 
 .c-tr {
-  top: -2px;
-  right: -2px;
+  top: 6px;
+  right: 6px;
   border-top: 2px solid;
-  border-right: 2px solid
+  border-right: 2px solid;
 }
 
 .c-bl {
-  bottom: -2px;
-  left: -2px;
+  bottom: 6px;
+  left: 6px;
   border-bottom: 2px solid;
-  border-left: 2px solid
+  border-left: 2px solid;
 }
 
 .c-br {
-  bottom: -2px;
-  right: -2px;
+  bottom: 6px;
+  right: 6px;
   border-bottom: 2px solid;
-  border-right: 2px solid
+  border-right: 2px solid;
 }
 
-.frame-body {
-  padding: 2rem 2.25rem
-}
-
-@media (min-width:640px) {
-  .frame-body {
-    padding: 2.5rem 2.75rem
-  }
-}
-
-/* Terminal text fx */
+/* Text FX */
 .terminal {
-  text-shadow: 0 0 2px var(--dl-green), 0 0 6px var(--dl-green), 0 0 12px rgba(0, 255, 136, .7)
+  text-shadow: 0 0 2px var(--dl-green), 0 0 6px var(--dl-green), 0 0 12px rgba(0, 255, 136, .7);
 }
 
 .cursor {
-  animation: blink 1s steps(1) infinite
+  animation: blink 1s steps(1) infinite;
 }
 
 @keyframes blink {
 
   0%,
   100% {
-    opacity: 1
+    opacity: 1;
   }
 
   50% {
-    opacity: 0
+    opacity: 0;
   }
 }
 
-/* Glitch headline */
 .glitch {
-  position: relative
+  position: relative;
 }
 
 .glitch::before,
@@ -175,228 +185,56 @@ body {
   position: absolute;
   left: 0;
   top: 0;
-  pointer-events: none
+  pointer-events: none;
 }
 
 .glitch::before {
   text-shadow: -1px 0 var(--dl-red);
-  animation: gx 2.2s infinite linear alternate
+  animation: gx 2.2s infinite linear alternate;
 }
 
 .glitch::after {
   text-shadow: 1px 0 var(--dl-cyan);
-  animation: gy 1.9s infinite linear alternate
+  animation: gy 1.9s infinite linear alternate;
 }
 
 @keyframes gx {
   0% {
-    transform: translate(0)
+    transform: translate(0);
   }
 
   25% {
-    transform: translate(1px)
+    transform: translate(1px);
   }
 
   50% {
-    transform: translate(-1px)
+    transform: translate(-1px);
   }
 
   75% {
-    transform: translate(2px)
+    transform: translate(2px);
   }
 
   100% {
-    transform: translate(0)
+    transform: translate(0);
   }
 }
 
 @keyframes gy {
   0% {
-    transform: translateY(0)
+    transform: translateY(0);
   }
 
   50% {
-    transform: translateY(1px)
+    transform: translateY(1px);
   }
 
   100% {
-    transform: translateY(0)
+    transform: translateY(0);
   }
 }
 
-/* Boot progress (guaranteed movement) */
-.boot {
-  position: relative;
-  height: 8px;
-  border: 1px solid rgba(0, 255, 120, .25);
-  background: rgba(0, 255, 120, .12);
-  overflow: hidden
-}
-
-.boot .fill {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 40%;
-  background: linear-gradient(90deg, #5aff5a, #caffca);
-  box-shadow: 0 0 12px #0f0;
-  animation: bootWidth 2.1s ease-in-out infinite alternate;
-}
-
-.boot::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: -25%;
-  width: 28%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .25), transparent);
-  animation: bootSweep 1.4s linear infinite;
-}
-
-@keyframes bootWidth {
-  0% {
-    width: 15%
-  }
-
-  100% {
-    width: 92%
-  }
-}
-
-@keyframes bootSweep {
-  0% {
-    left: -25%
-  }
-
-  100% {
-    left: 110%
-  }
-}
-
-/* dial container: clip overspill so it won't cover the block below */
-.burn-dial {
-  --size: 320px;
-  width: var(--size);
-  height: var(--size);
-  position: relative;
-  border-radius: 50%;
-  isolation: isolate;
-  /* was overflow: visible; */
-  overflow: hidden;
-  /* ⬅ clip outer glow/marker */
-  display: grid;
-  place-items: center;
-  filter: saturate(115%);
-}
-
-/* lit arc (put under readout) + make inner hole larger so text never gets hit */
-.dial-ring {
-  --pct: 0;
-  position: absolute;
-  inset: 6%;
-  z-index: 1;
-  /* ⬅ below text */
-  border-radius: 50%;
-  background:
-    conic-gradient(from -90deg,
-      #22ff00 calc(var(--pct)*1%),
-      rgba(34, 255, 0, .08) calc(var(--pct)*1%));
-  /* inner hole: make it wider (was 58/59) */
-  mask: radial-gradient(circle at 50% 50%, transparent 62%, black 63%);
-  -webkit-mask: radial-gradient(circle at 50% 50%, transparent 62%, black 63%);
-  box-shadow: inset 0 0 18px rgba(0, 0, 0, .7);
-}
-
-/* chevrons + marker under text as well */
-.dial-chevrons {
-  z-index: 1;
-}
-
-.dial-marker {
-  z-index: 1;
-}
-
-/* readout always on top */
-.dial-readout {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  /* ⬅ above everything */
-  display: grid;
-  place-items: center;
-  pointer-events: none
-}
-
-
-/* pulse effect on buyback */
-.burn-dial.pulse .dial-marker::before {
-  animation: marker-pop .45s ease-out 1;
-}
-
-.burn-dial.pulse .dial-chevrons {
-  animation-duration: 6s;
-  /* speed up briefly */
-}
-
-.burn-dial .dial-hit {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: 50%;
-}
-
-.burn-dial.pulse .dial-hit {
-  animation: ripple .55s ease-out 1;
-}
-
-@keyframes marker-pop {
-  0% {
-    transform: translate(-50%, -50%) rotate(var(--angle)) translate(calc((var(--size)/2) - 22px));
-    box-shadow: 0 0 10px #ffee66, 0 0 26px rgba(255, 238, 102, .7)
-  }
-
-  50% {
-    transform: translate(-50%, -50%) rotate(var(--angle)) translate(calc((var(--size)/2) - 18px));
-    box-shadow: 0 0 22px #ffee66, 0 0 50px rgba(255, 238, 102, .9)
-  }
-
-  100% {
-    transform: translate(-50%, -50%) rotate(var(--angle)) translate(calc((var(--size)/2) - 22px));
-  }
-}
-
-@keyframes ripple {
-  0% {
-    box-shadow: 0 0 0 0 rgba(34, 255, 0, .35), 0 0 0 8px rgba(34, 255, 0, .22), 0 0 0 16px rgba(34, 255, 0, .08)
-  }
-
-  100% {
-    box-shadow: 0 0 0 12px rgba(34, 255, 0, 0), 0 0 0 24px rgba(34, 255, 0, 0), 0 0 0 40px rgba(34, 255, 0, 0)
-  }
-}
-
-/* readout */
-.dial-readout {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none
-}
-
-.dial-readout .pct {
-  font-size: 2rem;
-  text-shadow: 0 0 6px #22ff00, 0 0 14px #22ff00
-}
-
-.dial-readout .label {
-  margin-top: .25rem;
-  font-size: .72rem;
-  letter-spacing: .35em;
-  color: #dffff0
-}
-
-/* Ticker (viewport + track; distance & speed set from JS) */
+/* Ticker */
 .ticker {
   position: fixed;
   left: 0;
@@ -406,12 +244,12 @@ body {
   height: 30px;
   background: rgba(0, 0, 0, .9);
   border-top: 1px solid rgba(34, 255, 0, .3);
-  box-shadow: 0 0 10px rgba(0, 255, 120, .2) inset
+  box-shadow: 0 0 10px rgba(0, 255, 120, .2) inset;
 }
 
 .t-viewport {
   width: 100%;
-  overflow: hidden
+  overflow: hidden;
 }
 
 .t-track {
@@ -427,15 +265,401 @@ body {
 .t-item {
   padding: 0 .9rem;
   color: #aaffb3;
-  text-shadow: 0 0 2px var(--dl-green)
+  text-shadow: 0 0 2px var(--dl-green);
 }
 
 @keyframes marquee {
   from {
-    transform: translateX(0)
+    transform: translateX(0);
   }
 
   to {
-    transform: translateX(calc(-1 * var(--marquee-width)))
+    transform: translateX(calc(-1 * var(--marquee-width)));
   }
+}
+
+/* Sections */
+.section {
+  border: 1px solid rgba(34, 255, 0, .25);
+  padding: .75rem .9rem;
+  margin-bottom: .75rem;
+  background: rgba(0, 0, 0, .4);
+}
+
+/* ───────────── Boot stream ───────────── */
+.logwrap {
+  position: relative;
+  height: clamp(260px, 42vh, 360px);
+  overflow: hidden;
+  border: 1px solid rgba(34, 255, 0, .25);
+  background: radial-gradient(120% 120% at 50% 40%, rgba(0, 20, 0, .7) 0%, rgba(0, 0, 0, .92) 60%);
+  box-shadow: inset 0 0 28px rgba(0, 255, 90, .12), 0 0 40px rgba(0, 255, 120, .15);
+  border-radius: 8px;
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 94%, rgba(0, 0, 0, 0) 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0, rgba(0, 0, 0, 1) 6%, rgba(0, 0, 0, 1) 94%, rgba(0, 0, 0, 0) 100%);
+}
+
+.logstream {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  padding: .75rem .9rem;
+  scrollbar-width: none;
+}
+
+.logstream::-webkit-scrollbar {
+  display: none;
+}
+
+.logline {
+  display: flex;
+  gap: .6rem;
+  align-items: baseline;
+  font-size: clamp(12px, 1.7vw, 14px);
+  line-height: 1.35;
+  white-space: nowrap;
+  padding: 1px 0;
+  text-shadow: 0 0 2px var(--dl-green);
+}
+
+.logtime {
+  color: #caffca;
+  opacity: .9;
+}
+
+.logtag {
+  color: #0f0;
+  background: rgba(34, 255, 0, .12);
+  border: 1px solid rgba(34, 255, 0, .28);
+  padding: 0 .35rem;
+  border-radius: 3px;
+}
+
+.loghash {
+  color: #b8ffd0;
+  opacity: .95;
+}
+
+.logaddr {
+  color: #a6ffe3;
+  opacity: .95;
+}
+
+.lognum {
+  color: #ffee88;
+}
+
+.logwarn {
+  color: #ffdd66;
+  text-shadow: 0 0 6px rgba(255, 238, 102, .6);
+}
+
+.logerr {
+  color: #ff5566;
+  text-shadow: 0 0 6px rgba(255, 85, 102, .6);
+}
+
+.logok {
+  color: #b8ffd0;
+}
+
+.logburn {
+  color: #22ff00;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+.scanline {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 18px;
+  top: -18px;
+  background: linear-gradient(0deg, rgba(0, 255, 110, .25), transparent);
+  filter: blur(.6px);
+  animation: scan 2.6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scan {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(120%);
+  }
+}
+
+.headbar {
+  height: 6px;
+  margin: .5rem 0 1rem 0;
+  position: relative;
+  background: linear-gradient(90deg, rgba(34, 255, 0, .2), rgba(34, 255, 0, .7), rgba(34, 255, 0, .2));
+  overflow: hidden;
+  border: 1px solid rgba(34, 255, 0, .35);
+}
+
+.headbar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -20%;
+  width: 20%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent);
+  animation: headSweep 1.8s linear infinite;
+}
+
+@keyframes headSweep {
+  0% {
+    left: -20%;
+  }
+
+  100% {
+    left: 120%;
+  }
+}
+
+/* ───────────── Entry Gate (10s) ───────────── */
+.entryGate {
+  margin-top: .9rem;
+  border: 1px solid rgba(34, 255, 0, .35);
+  border-radius: 6px;
+  padding: .6rem .7rem .85rem;
+  background: rgba(0, 0, 0, .55);
+  box-shadow: inset 0 0 18px rgba(0, 255, 90, .12);
+}
+
+.entryGate .label {
+  font-size: .85rem;
+  color: #caffca;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: .55rem;
+}
+
+.entrybar {
+  height: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(34, 255, 0, .35);
+  background: rgba(0, 0, 0, .55);
+}
+
+.entrybar .fill {
+  --pct: 0;
+  height: 100%;
+  width: calc(var(--pct) * 100%);
+  background:
+    linear-gradient(90deg,
+      hsla(calc(120 * var(--pct)), 100%, 42%, .15) 0%,
+      hsla(calc(120 * var(--pct)), 100%, 42%, .95) 20%,
+      hsla(calc(120 * var(--pct)), 100%, 48%, 1) 60%,
+      hsla(calc(120 * var(--pct)), 100%, 42%, .9) 100%);
+  box-shadow: 0 0 8px hsla(calc(120 * var(--pct)), 100%, 50%, .55),
+    0 0 18px hsla(calc(120 * var(--pct)), 100%, 50%, .35);
+  transition: width .06s linear, box-shadow .06s linear, background-color .06s linear;
+}
+
+.entrybar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -25%;
+  width: 22%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .45), transparent);
+  animation: entrySweep 1.4s linear infinite;
+}
+
+@keyframes entrySweep {
+  0% {
+    left: -25%;
+  }
+
+  100% {
+    left: 110%;
+  }
+}
+
+.authlist {
+  margin-top: .6rem;
+  font-size: .86rem;
+  line-height: 1.35;
+  max-height: 102px;
+  overflow: hidden;
+}
+
+.authline {
+  display: flex;
+  gap: .6rem;
+  white-space: nowrap;
+}
+
+.auth-tag {
+  color: #0f0;
+  background: rgba(34, 255, 0, .12);
+  border: 1px solid rgba(34, 255, 0, .28);
+  padding: 0 .35rem;
+  border-radius: 3px;
+}
+
+.auth-msg {
+  color: #b8ffd0;
+}
+
+.auth-fail {
+  color: #ff5566;
+  text-shadow: 0 0 6px rgba(255, 85, 102, .75);
+}
+
+.auth-pass {
+  color: #22ff00;
+  text-shadow: 0 0 8px rgba(34, 255, 0, .6);
+  font-weight: 700;
+}
+
+.pressEnter {
+  margin-top: .85rem;
+  font-size: .95rem;
+}
+
+.locked {
+  cursor: not-allowed;
+}
+
+/* ───────────── Warning banner + glitch FX ───────────── */
+.shake {
+  animation: shake .35s ease-in-out;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.glitchFX {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 0, 68, .18) 0 2px, transparent 2px 4px);
+  mix-blend-mode: screen;
+}
+
+.glitchFX.on {
+  animation: tear .25s ease-out 1;
+}
+
+@keyframes tear {
+  0% {
+    opacity: .8;
+    filter: url('#');
+    transform: skewX(0deg) translateY(0);
+  }
+
+  50% {
+    opacity: .35;
+    transform: skewX(2deg) translateY(-2px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: skewX(0deg) translateY(0);
+  }
+}
+
+/* Reduced motion tweaks */
+@media (prefers-reduced-motion: reduce) {
+  .t-track {
+    animation-duration: 60s;
+  }
+
+  .headbar::after,
+  .entrybar::after,
+  .scanline {
+    animation-duration: 3s;
+  }
+
+  .shake {
+    animation-duration: .6s;
+  }
+}
+
+/* Link Styling Overrides */
+a {
+  color: var(--dl-green) !important;
+  /* Use root variable for consistency */
+  text-decoration: none !important;
+  /* Remove underline */
+}
+
+a:hover {
+  color: var(--dl-yellow) !important;
+  /* Use root variable for hover */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────── */
+/* 🔥 Deadloop Animated Glow Text  */
+/* ─────────────────────────────── */
+@keyframes glowPulse {
+
+  0%,
+  100% {
+    text-shadow:
+      0 0 6px #ccffd9,
+      0 0 12px #66ff99,
+      0 0 20px #22ff88,
+      0 0 28px #22ff88,
+      0 0 36px #22ff88;
+  }
+
+  50% {
+    text-shadow:
+      0 0 10px #ccffd9,
+      0 0 20px #66ff99,
+      0 0 30px #22ff88,
+      0 0 45px #22ff88,
+      0 0 60px #22ff88;
+  }
+}
+
+.glow-text {
+  color: #ccffd9;
+  text-shadow:
+    0 0 6px #ccffd9,
+    0 0 12px #66ff99,
+    0 0 20px #22ff88,
+    0 0 28px #22ff88,
+    0 0 36px #22ff88;
+  animation: glowPulse 2.8s ease-in-out infinite;
 }
