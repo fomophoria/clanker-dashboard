@@ -8,28 +8,39 @@ export default function MiniApp() {
     }, [])
 
     return (
-        <div
-            className="mx-auto bg-black overflow-hidden"
-            style={{
-                width: '100%',
-                maxWidth: 424,      // mini app width on web
-                height: '100dvh',   // fill the available host height
-                maxHeight: 695,     // web host cap
-            }}
-        >
-            <iframe
-                src="/launch"       // same-origin page
-                title="DEADLOOP"
+        <>
+            {/* prevent the OUTER page from scrolling anywhere */}
+            <style jsx global>{`
+        html, body, #__next {
+          height: 100%;
+          overflow: hidden;    /* <- kill the outer scrollbar */
+          background: #000;
+        }
+      `}</style>
+
+            <div
+                className="mx-auto bg-black overflow-hidden"
                 style={{
                     width: '100%',
-                    height: '100%',
-                    border: 'none',
-                    display: 'block',
-                    overflow: 'hidden',
+                    maxWidth: 424,       // mini app width on web
+                    height: '100dvh',    // fill host height on mobile/web
+                    // IMPORTANT: no maxHeight here so the page itself never needs to scroll
                 }}
-                scrolling="auto"    // single inner scrollbar if needed
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            />
-        </div>
+            >
+                <iframe
+                    src="/launch"        // same-origin
+                    title="DEADLOOP"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        display: 'block',
+                        overflow: 'hidden',
+                    }}
+                    scrolling="auto"     // the ONLY scrollbar, inside the iframe
+                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                />
+            </div>
+        </>
     )
 }
