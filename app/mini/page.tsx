@@ -9,11 +9,11 @@ export default function MiniApp() {
 
     return (
         <>
-            {/* prevent the OUTER page from scrolling anywhere */}
+            {/* Disable body scroll */}
             <style jsx global>{`
         html, body, #__next {
           height: 100%;
-          overflow: hidden;    /* <- kill the outer scrollbar */
+          overflow: hidden;
           background: #000;
         }
       `}</style>
@@ -22,13 +22,12 @@ export default function MiniApp() {
                 className="mx-auto bg-black overflow-hidden"
                 style={{
                     width: '100%',
-                    maxWidth: 424,       // mini app width on web
-                    height: '100dvh',    // fill host height on mobile/web
-                    // IMPORTANT: no maxHeight here so the page itself never needs to scroll
+                    maxWidth: 424,
+                    height: '100dvh',
                 }}
             >
                 <iframe
-                    src="/launch"        // same-origin
+                    src="/launch"
                     title="DEADLOOP"
                     style={{
                         width: '100%',
@@ -37,7 +36,7 @@ export default function MiniApp() {
                         display: 'block',
                         overflow: 'hidden',
                     }}
-                    scrolling="auto"     // the ONLY scrollbar, inside the iframe
+                    scrolling="no"  // <── disable inner scroll
                     sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                 />
             </div>
