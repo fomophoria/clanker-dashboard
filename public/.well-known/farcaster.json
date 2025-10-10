@@ -18,7 +18,6 @@
         ],
         "subtitle": "DEADLOOP Dashboard mini app",
         "description": "Compact view of the DEADLOOP dashboard sized for Farcaster Mini Apps.",
-        // 👇 add these
         "imageUrl": "https://deadloop.xyz/og-1200x800.png",
         "buttonTitle": "Open DEADLOOP",
         "ogTitle": "DEADLOOP PROTOCOL",
