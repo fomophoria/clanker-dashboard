@@ -4,34 +4,48 @@ import { sdk } from '@farcaster/miniapp-sdk'
 
 export default function MiniApp() {
     useEffect(() => {
-        // Tell Farcaster host we're ready when the component mounts
         sdk.actions.ready().catch(() => { })
     }, [])
 
     return (
-        <div
-            className="mx-auto bg-black overflow-hidden"
-            style={{
-                width: '100%',
-                maxWidth: 424,
-                height: '100dvh',
-                maxHeight: 695,
-                overflow: 'hidden',
-            }}
-        >
-            <iframe
-                src="/launch"
-                title="DEADLOOP"
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
-                    overflow: 'hidden',
-                    display: 'block',
-                }}
-                scrolling="no"
-                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            />
-        </div>
+        <>
+            {/* Make the host page itself non-scrollable */}
+            <style jsx global>{`
+        html, body {
+          height: 100%;
+          overflow: hidden;      /* <- hide any outer scrollbar */
+          background: #000;
+        }
+        #__next, main {
+          height: 100%;
+        }
+      `}</style>
+
+            {/* Fill the host window; center a 424px-wide column */}
+            <div className="fixed inset-0 flex justify-center bg-black">
+                <div
+                    className="overflow-hidden"
+                    style={{
+                        width: '100%',
+                        maxWidth: 424,        // Mini App width on web host
+                        height: '100%',       // fill host height; no outer scrolling
+                    }}
+                >
+                    <iframe
+                        src="/launch"         // same-origin route
+                        title="DEADLOOP"
+                        style={{
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            display: 'block',
+                            overflow: 'hidden',
+                        }}
+                        scrolling="auto"      // allow a single inner scrollbar only
+                        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                    />
+                </div>
+            </div>
+        </>
     )
 }
