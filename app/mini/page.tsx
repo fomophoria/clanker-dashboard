@@ -8,44 +8,28 @@ export default function MiniApp() {
     }, [])
 
     return (
-        <>
-            {/* Make the host page itself non-scrollable */}
-            <style jsx global>{`
-        html, body {
-          height: 100%;
-          overflow: hidden;      /* <- hide any outer scrollbar */
-          background: #000;
-        }
-        #__next, main {
-          height: 100%;
-        }
-      `}</style>
-
-            {/* Fill the host window; center a 424px-wide column */}
-            <div className="fixed inset-0 flex justify-center bg-black">
-                <div
-                    className="overflow-hidden"
-                    style={{
-                        width: '100%',
-                        maxWidth: 424,        // Mini App width on web host
-                        height: '100%',       // fill host height; no outer scrolling
-                    }}
-                >
-                    <iframe
-                        src="/launch"         // same-origin route
-                        title="DEADLOOP"
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            border: 'none',
-                            display: 'block',
-                            overflow: 'hidden',
-                        }}
-                        scrolling="auto"      // allow a single inner scrollbar only
-                        sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                    />
-                </div>
-            </div>
-        </>
+        <div
+            className="mx-auto bg-black overflow-hidden"
+            style={{
+                width: '100%',
+                maxWidth: 424,      // mini app width on web
+                height: '100dvh',   // fill the available host height
+                maxHeight: 695,     // web host cap
+            }}
+        >
+            <iframe
+                src="/launch"       // same-origin page
+                title="DEADLOOP"
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    border: 'none',
+                    display: 'block',
+                    overflow: 'hidden',
+                }}
+                scrolling="auto"    // single inner scrollbar if needed
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            />
+        </div>
     )
 }
