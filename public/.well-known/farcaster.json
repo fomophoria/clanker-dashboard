@@ -1,4 +1,9 @@
 {
+    "accountAssociation": {
+        "header": "eyJmaWQiOjEzNzE2NDQsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhlMjhCQTlhZWFhY2VGN0Q5YmFCMUU2NTA2RUI0MGY0ZURkNjU5NTZlIn0",
+        "payload": "eyJkb21haW4iOiJkZWFkbG9vcC54eXoifQ",
+        "signature": "MHhiMmRhMDIxMTQ3ODVmNjQxOTg0ZDRiMjUyZjNjN2JmOWZkZjg4OWI4OTg2N2YwNzZjMDU3MGRjZDA3Yzc4Y2RjNzk0Y2U5OGVkOWY5NTJiNzg2YjQ2YzNkNTRmYzUxZDdlNDNhOTQ5M2MzMGZmM2ZjZjBiMGYwNDY4N2E4MDNmZDFj"
+    },
     "miniapp": {
         "version": "1",
         "name": "DEADLOOP PROTOCOL",
