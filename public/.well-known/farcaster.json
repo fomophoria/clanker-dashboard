@@ -1,0 +1,17 @@
+{
+    "miniapp": {
+        "version": "1",
+        "name": "DEADLOOP PROTOCOL",
+        "homeUrl": "https://deadloop.xyz/mini",
+        "iconUrl": "https://deadloop.xyz/icon-1024.png",
+        "splashImageUrl": "https://deadloop.xyz/icon-200.png",
+        "splashBackgroundColor": "#000000",
+        "requiredCapabilities": [],
+        "tags": [
+            "community",
+            "token"
+        ],
+        "subtitle": "DEADLOOP Dashboard mini app",
+        "description": "Compact view of the DEADLOOP dashboard sized for Farcaster Mini Apps."
+    }
+}
