@@ -432,10 +432,17 @@ export default function Page() {
   }, []);
   /* data (after gate) */
   const shouldPoll = !gate;
-  const { data: burns } = useSWR(shouldPoll ? "/api/burns" : null, fetcher, {
+
+  const { data: stats } = useSWR(shouldPoll ? "/api/burns/stats" : null, fetcher, {
     refreshInterval: 1500,
     revalidateOnFocus: false,
   });
+
+  const { data: recent } = useSWR(shouldPoll ? "/api/burns/recent" : null, fetcher, {
+    refreshInterval: 1200,
+    revalidateOnFocus: false,
+  });
+
 
   useEffect(() => {
     if (!stats) return;
@@ -456,7 +463,8 @@ export default function Page() {
     animateNumber({ from: bbAmt, to: targetCount, ms: 500, onUpdate: (v) => setBbAmt(Math.round(v)) });
   }, [stats?.count]);
 
-  const recentList = burns?.burns || [];
+  const recentList = Array.isArray(recent?.items) ? recent.items : [];
+
 
   return (
     <main className="scene">
@@ -594,7 +602,7 @@ tx_in => supply_out => price_up`}
                   <div className="section md:col-span-3 text-xs overflow-hidden">
                     <div className="text-[#22ff00] mb-1 softglow">LIVE TOKEN BURNS</div>
                     <div className="h-[180px] pr-2">
-                      {!recentList || recentList.length === 0 ? (
+                      {Array.isArray(recentList) && recentList.length === 0 ? (
                         <div className="text-[#aaffb3]/70">awaiting claims…</div>
                       ) : (
                         recentList.slice(0, 10).map((t, i) => (
