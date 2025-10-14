@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
-const prisma = new PrismaClient();
-
-const TOTAL_SUPPLY = 1_000_000_000; // or your actual total
+// ✅ Correct total supply for DL
+const TOTAL_SUPPLY = 100_000_000_000; // 100 billion DL tokens
 
 export async function GET() {
   try {
     const burns = await prisma.burn.findMany();
-    const totalBurned = burns.reduce((sum, b) => sum + Number(b.amountHuman || 0), 0);
+
+    const totalBurned = burns.reduce(
+      (sum, b) => sum + Number(b.amountHuman || 0),
+      0
+    );
+
+    // ✅ Correct math — percentage and remaining supply
     const remainingSupply = TOTAL_SUPPLY - totalBurned;
     const percentBurned = (totalBurned / TOTAL_SUPPLY) * 100;
 
@@ -18,10 +23,11 @@ export async function GET() {
       percentBurned,
       count: burns.length,
     });
-  } catch (err) {
-    console.error("Error fetching stats:", err);
-    return NextResponse.json({ error: "Failed to fetch stats" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+  } catch (error) {
+    console.error("Error fetching burn stats:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch burn stats" },
+      { status: 500 }
+    );
   }
 }
