@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "watcher": "ts-node --transpile-only watcher/worker.ts",
-    "build": "next build --turbopack",
+    "build": "next build",
     "start": "next start",
+    "postinstall": "prisma generate",
     "lint": "eslint"
   },
   "dependencies": {
