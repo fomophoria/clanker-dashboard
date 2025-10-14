@@ -608,7 +608,7 @@ tx_in => supply_out => price_up
                       Status: <span className="text-[#ffee00]">ONLINE</span>
                     </div>
                     <div>
-                      Buyback pulses: <FlipText value={bbAmt.toLocaleString()} className="terminal" />
+                      Burn pulses: <FlipText value={bbAmt.toLocaleString()} className="terminal" />
                     </div>
                     <div className="mt-2">WHY DEADLOOP PRINTS GREEN</div>
                     <ul className="list-disc ml-4 opacity-90">
@@ -630,7 +630,7 @@ tx_in => supply_out => price_up
 
                   {/* Full width: recent burns */}
                   <div className="section md:col-span-3 text-xs overflow-hidden">
-                    <div className="text-[#22ff00] mb-1 softglow">LIVE CLAIMS & TOKEN BURNS</div>
+                    <div className="text-[#22ff00] mb-1 softglow">LIVE TOKEN BURNS</div>
                     {/* scrollbar removed: keep static height */}
                     <div className="h-[180px] pr-2">
                       {!recentList || recentList.length === 0 ? (
@@ -689,24 +689,24 @@ tx_in => supply_out => price_up
                       <div className="t-track shimmer" ref={trackRef}>
                         <div ref={blockRef} style={{ display: "inline-flex", gap: 40 }}>
                           <span className="t-item">
-                            DEADLOOP ONLINE ▸ RECURSIVE BUYBACK ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
                           </span>
                           <span className="t-item">
-                            DEADLOOP ONLINE ▸ RECURSIVE BUYBACK ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
                           </span>
                           <span className="t-item">
-                            DEADLOOP ONLINE ▸ RECURSIVE BUYBACK ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
                           </span>
                         </div>
                         <div aria-hidden="true" style={{ display: "inline-flex", gap: 40 }}>
                           <span className="t-item">
-                            DEADLOOP ONLINE ▸ RECURSIVE BUYBACK ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
                           </span>
                           <span className="t-item">
-                            DEADLOOP ONLINE ▸ RECURSIVE BUYBACK ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
                           </span>
                           <span className="t-item">
-                            DEADLOOP ONLINE ▸ RECURSIVE BUYBACK ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸
                           </span>
                         </div>
                         <div className="ticker-sheen" aria-hidden />
