@@ -432,12 +432,8 @@ export default function Page() {
   }, []);
   /* data (after gate) */
   const shouldPoll = !gate;
-  const { data: stats } = useSWR(shouldPoll ? "/api/burns/stats" : null, fetcher, {
+  const { data: burns } = useSWR(shouldPoll ? "/api/burns" : null, fetcher, {
     refreshInterval: 1500,
-    revalidateOnFocus: false,
-  });
-  const { data: recent } = useSWR(shouldPoll ? "/api/burns/recent" : null, fetcher, {
-    refreshInterval: 1200,
     revalidateOnFocus: false,
   });
 
@@ -460,8 +456,7 @@ export default function Page() {
     animateNumber({ from: bbAmt, to: targetCount, ms: 500, onUpdate: (v) => setBbAmt(Math.round(v)) });
   }, [stats?.count]);
 
-  const recentList: Array<{ txHash: string; amountHuman: number | string; timestamp: number | string | Date }> =
-    Array.isArray(recent) ? recent : recent?.items || [];
+  const recentList = burns?.burns || [];
 
   return (
     <main className="scene">
