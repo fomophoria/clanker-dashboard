@@ -34,9 +34,9 @@ const tx = () =>
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("")}`;
 
-/*──────────────────────────────────────────────
+/* ─────────────────────────────────────────────
    Degen Boot Stream
-──────────────────────────────────────────────*/
+───────────────────────────────────────────── */
 type LogLine = { id: string; ts: string; tag: string; frag: React.ReactNode; className?: string };
 const TAGS = ["TX", "CLAIM", "BURN", "POOL", "SWEEP", "ORACLE", "SLIPP", "WARN"];
 const PHRASES = [
@@ -148,17 +148,20 @@ function DegenBootStream({ speed = 48 }: { speed?: number }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const [lines, setLines] = useState<LogLine[]>([]);
   const [toast, setToast] = useState<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     setLines(Array.from({ length: 24 }, makeLine));
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setLines((prev) => {
         const next = [...prev, makeLine()];
         if (next.length > 140) next.splice(0, next.length - 140);
         return next;
       });
     }, speed);
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [speed]);
 
   useEffect(() => {
@@ -166,6 +169,7 @@ function DegenBootStream({ speed = 48 }: { speed?: number }) {
     if (el) el.scrollTop = el.scrollHeight;
   }, [lines]);
 
+  // click-to-copy hashes (delegated)
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -195,8 +199,8 @@ function DegenBootStream({ speed = 48 }: { speed?: number }) {
           <motion.div
             key={ln.id}
             className={`logline ${ln.tag.toLowerCase()}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            initial={{ opacity: 0, filter: "brightness(1.6) blur(1px)" }}
+            animate={{ opacity: 1, filter: "brightness(1) blur(0px)" }}
             transition={{ duration: 0.18 }}
           >
             <span className="logtime">{ln.ts}</span>
@@ -222,10 +226,158 @@ function DegenBootStream({ speed = 48 }: { speed?: number }) {
     </div>
   );
 }
+/* ─────────────────────────────────────────────
+   System Breach
+───────────────────────────────────────────── */
+type Attempt = { keyId: string; id: string; text: string; status: "fail" | "pass" };
+const PROTOCOLS = ["BURN-X1", "ROGUE-A3", "PURGE-Z9", "BURN-K5", "ROGUE-D7", "PURGE-Y2", "BURN-M9", "ROGUE-B4", "PURGE-X6"];
 
-/*──────────────────────────────────────────────
-   Main Page (simplified but identical visually)
-──────────────────────────────────────────────*/
+function SystemBreach({
+  durationMs,
+  onReady,
+}: {
+  durationMs: number;
+  onReady: () => void;
+}) {
+  const [pct, setPct] = useState(0);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [unlocked, setUnlocked] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("DEADLOOP ROGUE BURN ▸ INITIATING");
+  const [shake, setShake] = useState(false);
+  const rafRef = useRef<number | null>(null);
+  const lastPctMilestone = useRef(0);
+
+  const script = useMemo(() => {
+    const fails = randi(7, 9);
+    const slots = fails + 1;
+    const step = durationMs / slots;
+    const list: { t: number; kind: "fail" | "pass" }[] = [];
+    for (let i = 0; i < fails; i++) list.push({ t: Math.round((i + 1) * step * 0.9), kind: "fail" });
+    list.push({ t: durationMs - 600, kind: "pass" });
+    return list.sort((a, b) => a.t - b.t);
+  }, [durationMs]);
+
+  useEffect(() => {
+    const start = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const p = Math.min(1, elapsed / durationMs);
+      const pRounded = Math.floor(p * 20) / 20;
+      if (pRounded > lastPctMilestone.current) {
+        setPct(pRounded);
+        lastPctMilestone.current = pRounded;
+      }
+      const shouldCount = script.filter((s) => s.t <= elapsed).length;
+      setAttempts((prev) => {
+        if (prev.length >= shouldCount) return prev;
+        const next = [...prev];
+        for (let i = prev.length; i < shouldCount; i++) {
+          const s = script[i];
+          const protocol = pick(PROTOCOLS);
+          const keyId = tx();
+          if (s.kind === "fail") {
+            const messages = [
+              "TOKEN PURGE ATTEMPT FAILED",
+              "BURN LOOP ACCESS DENIED",
+              "PROTOCOL BREACH REJECTED",
+              "RECURSIVE BURN BLOCKED",
+            ];
+            const message = pick(messages);
+            next.push({
+              keyId,
+              id: protocol,
+              status: "fail",
+              text: `BREACH ▸ PROTOCOL ${protocol} ▸ STATUS: ${message}`,
+            });
+            setStatusMessage(`DEADLOOP ROGUE BURN ▸ ${message} ${protocol}`);
+            setShake(true);
+            setTimeout(() => setShake(false), 360);
+          } else {
+            next.push({
+              keyId,
+              id: protocol,
+              status: "pass",
+              text: `BREACH ▸ PROTOCOL ${protocol} ▸ STATUS: BURN PROTOCOL ENGAGED`,
+            });
+            setStatusMessage("DEADLOOP ROGUE BURN ▸ PROTOCOL ENGAGED");
+          }
+        }
+        return next.slice(-5);
+      });
+      if (p < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        setUnlocked(true);
+        setTimeout(() => onReady(), 240);
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [durationMs, onReady, script]);
+
+  return (
+    <div className={`entryGate ${shake ? "shake" : ""}`} aria-live="polite">
+      <div className="label">{unlocked ? "DEADLOOP ROGUE BURN ▸ PROTOCOL ENGAGED" : statusMessage}</div>
+      <div className="entrybar" aria-hidden="true">
+        <div className="fill" style={{ ["--pct" as any]: pct }} />
+      </div>
+      <div className="authlist">
+        {attempts.map((at) => (
+          <div key={at.keyId} className="authline">
+            <span className="auth-tag">[BREACH]</span>
+            <span className={`auth-msg ${at.status === "fail" ? "auth-fail" : "auth-pass"}`}>{at.text}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Tiny UI helpers
+───────────────────────────────────────────── */
+function FlipText({ value, className }: { value: string; className?: string }) {
+  return (
+    <motion.span
+      key={value}
+      initial={{ rotateX: -90, opacity: 0, y: -6 }}
+      animate={{ rotateX: 0, opacity: 1, y: 0 }}
+      transition={{ duration: 0.28 }}
+      className={className}
+      style={{ display: "inline-block", transformOrigin: "bottom" }}
+    >
+      {value}
+    </motion.span>
+  );
+}
+
+function Embers({ n = 4 }: { n?: number }) {
+  const seeds = useMemo(() => Array.from({ length: n }, () => Math.random()), [n]);
+  return (
+    <>
+      {seeds.map((s, i) => {
+        const x = (s * 100).toFixed(2);
+        const delay = s * 0.15;
+        const dur = 0.8 + s * 0.4;
+        return (
+          <motion.span
+            key={i}
+            className="ember"
+            initial={{ opacity: 0, y: 8, x: `${x}%`, scale: 0.6 }}
+            animate={{ opacity: [0, 1, 0], y: -20 - s * 20, scale: 1 }}
+            transition={{ duration: dur, delay }}
+          />
+        );
+      })}
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   Main Page Component
+───────────────────────────────────────────── */
 export default function Page() {
   const [gate, setGate] = useState(true);
   const [ready, setReady] = useState(false);
@@ -235,11 +387,56 @@ export default function Page() {
   const [bbAmt, setBbAmt] = useState(0);
   const [pulse, setPulse] = useState(false);
 
-  const { data: stats } = useSWR(!gate ? "/api/burns/stats" : null, fetcher, {
+  // ticker
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const blockRef = useRef<HTMLDivElement | null>(null);
+
+  // keyboard: enter
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (gate && ready && e.key === "Enter") enter();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [gate, ready]);
+
+  const enter = useCallback(() => {
+    if (!gate || !ready) return;
+    setGate(false);
+    const slogan = "INFINITE RECURSION. INFINITE BURN.";
+    let k = 0;
+    const t = setInterval(() => {
+      setHeadline(slogan.slice(0, k));
+      k++;
+      if (k > slogan.length) clearInterval(t);
+    }, 22);
+  }, [gate, ready]);
+
+  const onReady = useCallback(() => {
+    setReady(true);
+  }, []);
+
+  /* ticker sizing */
+  useEffect(() => {
+    const track = trackRef.current, block = blockRef.current;
+    if (!track || !block) return;
+    const update = () => {
+      const w = block.scrollWidth;
+      track.style.setProperty("--marquee-width", `${w}px`);
+      const secs = Math.max(10, Math.min(60, Math.round((w / 120) * 10) / 10));
+      track.style.setProperty("--marquee-time", `${secs}s`);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  /* data (after gate) */
+  const shouldPoll = !gate;
+  const { data: stats } = useSWR(shouldPoll ? "/api/burns/stats" : null, fetcher, {
     refreshInterval: 1500,
     revalidateOnFocus: false,
   });
-  const { data: recent } = useSWR(!gate ? "/api/burns/recent" : null, fetcher, {
+  const { data: recent } = useSWR(shouldPoll ? "/api/burns/recent" : null, fetcher, {
     refreshInterval: 1200,
     revalidateOnFocus: false,
   });
@@ -263,40 +460,270 @@ export default function Page() {
     animateNumber({ from: bbAmt, to: targetCount, ms: 500, onUpdate: (v) => setBbAmt(Math.round(v)) });
   }, [stats?.count]);
 
-  const recentList: Array<{ txHash: string; amountHuman: number | string }> =
+  const recentList: Array<{ txHash: string; amountHuman: number | string; timestamp: number | string | Date }> =
     Array.isArray(recent) ? recent : recent?.items || [];
 
   return (
     <main className="scene">
-      <div className="terminal-box">
-        <div className="frame-body">
-          <h1 className="terminal text-2xl mb-4">🔥 DEADLOOP PROTOCOL TERMINAL</h1>
-          <div className="mb-2">Burn rate: {burnPct.toFixed(6)}%</div>
-          <div className="mb-2">Remaining supply: {supply.toLocaleString()}</div>
-          <div className="mb-2">Total burns: {bbAmt.toLocaleString()}</div>
-          <div className="mb-4">Status: {pulse ? "🔥 BURNING..." : "IDLE"}</div>
+      <div className="crt-overlay" aria-hidden />
+      <div className="bgGrid" />
+      <div className="stars" />
+      <div className="burn-halo" aria-hidden />
 
-          <div className="text-[#22ff00] mb-1 softglow">Recent burns</div>
-          <div className="h-[180px] pr-2 overflow-auto">
-            {!recentList?.length ? (
-              <div className="text-[#aaffb3]/70">awaiting claims…</div>
-            ) : (
-              recentList.slice(0, 10).map((t, i) => (
-                <div key={`${t.txHash}-${i}`} className="flex justify-between gap-3 text-xs">
-                  <span className="text-[#b8ffd0] truncate">{t.txHash}</span>
-                  <span className="text-[#aaffb3] whitespace-nowrap">
-                    CLAIMED {t.amountHuman} — <span className="text-[#ffee00]">BURNED {t.amountHuman}</span>
-                  </span>
+      <AnimatePresence mode="wait">
+        {gate ? (
+          <motion.section
+            key="gate"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className={`terminal-box ${!ready ? "locked" : ""}`}
+            onClick={() => ready && enter()}
+            onTouchStart={() => ready && enter()}
+            role="button"
+            tabIndex={0}
+            aria-label={ready ? "Enter" : "System breach in progress"}
+          >
+            <span className="corn c-tl" />
+            <span className="corn c-tr" />
+            <span className="corn c-bl" />
+            <span className="corn c-br" />
+            <div className="frame-body">
+              <div className="flex items-center gap-4">
+                <img src="/deadloop.png" alt="Deadloop Logo" style={{ width: 150, height: 150, opacity: 0.95 }} />
+                <div className="flex-1">
+                  <h1
+                    className="text-2xl sm:text-3xl font-bold uppercase tracking-[0.25em] terminal glitch"
+                    data-text="DEADLOOP // TERMINAL"
+                  >
+                    DEADLOOP // TERMINAL
+                  </h1>
+                  <div className="headbar" />
                 </div>
-              ))
-            )}
-          </div>
+              </div>
 
-          <div className="mt-6">
-            <DegenBootStream speed={46} />
-          </div>
-        </div>
-      </div>
+              <div className="mt-3">
+                <DegenBootStream speed={46} />
+              </div>
+              <SystemBreach durationMs={10000} onReady={onReady} />
+              {ready && <div className="pressEnter terminal">PRESS ENTER ▾</div>}
+            </div>
+          </motion.section>
+        ) : (
+          <>
+            <motion.section
+              key="reveal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              className="terminal-box"
+            >
+              <span className="corn c-tl" />
+              <span className="corn c-tr" />
+              <span className="corn c-bl" />
+              <span className="corn c-br" />
+              <div className="frame-body">
+                <div className="flex items-center gap-3 mb-3">
+                  <img src="/deadloop.png" alt="Deadloop Logo" style={{ width: 150, height: 150, opacity: 0.95 }} />
+                  <h2
+                    className="text-2xl font-extrabold tracking-[0.18em] terminal glitch softglow"
+                    data-text="DEADLOOP PROTOCOL"
+                  >
+                    DEADLOOP PROTOCOL
+                  </h2>
+                </div>
+
+                <div className="mb-4">
+                  <pre className="terminal neoncode neoncode-lg" aria-label="What is Deadloop Protocol">
+                    {`WHAT IS DEADLOOP?
+// The first automated native-fee burn protocol launched on Clanker
+OVERVIEW:
+- Each eligible transaction includes a native-token fee.
+- Native fees are automatically routed to burn, reducing supply on-chain.
+FLOW:
+activity => native_fee => burn() => total_supply--
+RUNTIME:
+while (true) { if (tx_detected) burn(native_fee); }
+PROPERTIES:
+[DEF] continuous -> native tokens removed from supply
+[PRG] programmatic -> burns are on-chain and verifiable
+[RFX] reflexive -> higher usage => higher burn => lower supply
+SUMMARY:
+tx_in => supply_out => price_up`}
+                  </pre>
+                </div>
+
+                <div className="terminal mb-4 text-sm headline softglow">
+                  {headline} <span className="cursor">█</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="section md:col-span-1 flex justify-center">
+                    <div className={`burn-dial ${pulse ? "pulse" : ""}`} style={{ ["--size" as any]: "240px" }}>
+                      <div className="dial-ring" style={{ ["--pct" as any]: Math.min(100, Math.max(0, burnPct)) }} />
+                      <div className="dial-chevrons" />
+                      <div
+                        className="dial-marker"
+                        style={{ ["--angle" as any]: `${Math.min(100, Math.max(0, burnPct)) * 3.6}deg` }}
+                      />
+                      <div className="dial-hit" />
+                      <div className="dial-readout">
+                        <div className="text-center">
+                          <FlipText value={`${burnPct.toFixed(6)}%`} className="pct terminal" />
+                          <div className="label terminal">SUPPLY AUTO BURNED</div>
+                        </div>
+                      </div>
+                      <AnimatePresence>{pulse && <Embers n={4} />}</AnimatePresence>
+                    </div>
+                  </div>
+
+                  <div className="section md:col-span-1 text-sm">
+                    <div> Status: <span className="text-[#ffee00]">ONLINE</span></div>
+                    <div> Burn pulses: <FlipText value={bbAmt.toLocaleString()} className="terminal" /></div>
+                    <div className="mt-2">WHY DEADLOOP PRINTS GREEN</div>
+                    <ul className="list-disc ml-4 opacity-90">
+                      <li>Every tx → auto fee claim</li>
+                      <li>Claimed fees → permanent burn</li>
+                      <li>Supply ↓, Floor ↑</li>
+                    </ul>
+                  </div>
+
+                  <div className="section md:col-span-1 text-sm">
+                    <div className="text-[#22ff00] mb-1 softglow">REMAINING TOKEN SUPPLY</div>
+                    <FlipText value={supply.toLocaleString()} className="text-2xl terminal" />
+                    <div>Deflation velocity: HIGH</div>
+                    <div>Mode: <span className="text-accent">BURN</span></div>
+                  </div>
+
+                  <div className="section md:col-span-3 text-xs overflow-hidden">
+                    <div className="text-[#22ff00] mb-1 softglow">LIVE TOKEN BURNS</div>
+                    <div className="h-[180px] pr-2">
+                      {!recentList || recentList.length === 0 ? (
+                        <div className="text-[#aaffb3]/70">awaiting claims…</div>
+                      ) : (
+                        recentList.slice(0, 10).map((t, i) => (
+                          <div key={`${t.txHash}-${i}`} className="flex justify-between gap-3">
+                            <span className="text-[#b8ffd0] truncate">{t.txHash}</span>
+                            <span className="text-[#aaffb3] whitespace-nowrap">
+                              CLAIMED {t.amountHuman} — <span className="text-[#ffee00]">BURNED {t.amountHuman}</span>
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="section md:col-span-3 text-center">
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "2rem",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <span className="terminal">
+                        <a
+                          href="https://x.com/DeadloopLabs"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#22ff00] no-underline hover:text-[#ffee00]"
+                        >
+                          X: @DeadloopLabs
+                        </a>
+                      </span>
+                      <span className="terminal text-[#ff0044]">Clanker: TBC</span>
+                      <span className="terminal">
+                        <a
+                          href="https://farcaster.xyz/deadloopprotocol"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#22ff00] no-underline hover:text-[#ffee00]"
+                        >
+                          Farcaster: deadloopprotocol
+                        </a>
+                      </span>
+                      <span className="terminal text-[#ff0044]">Dex: TBC</span>
+                    </span>
+                  </div>
+
+                  <div className="md:col-span-4 text-center terminal mt-1 glow-text">
+                    Every fee transaction burns supply. Floor ascends. Supply collapses. You ascend.
+                  </div>
+
+                  <div className="ticker">
+                    <div className="t-viewport">
+                      <div className="t-track shimmer" ref={trackRef}>
+                        <div ref={blockRef} style={{ display: "inline-flex", gap: 40 }}>
+                          <span className="t-item">
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸{" "}
+                          </span>
+                          <span className="t-item">
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸{" "}
+                          </span>
+                          <span className="t-item">
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸{" "}
+                          </span>
+                        </div>
+                        <div aria-hidden="true" style={{ display: "inline-flex", gap: 40 }}>
+                          <span className="t-item">
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸{" "}
+                          </span>
+                          <span className="t-item">
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸{" "}
+                          </span>
+                          <span className="t-item">
+                            DEADLOOP ONLINE ▸ RECURSIVE BURN ▸ SUPPLY COLLAPSE ▸ VOLATILITY: MAX ▸ VALUE: INCREASING ▸{" "}
+                          </span>
+                        </div>
+                        <div className="ticker-sheen" aria-hidden />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+          </>
+        )}
+      </AnimatePresence>
+
+      <style jsx global>{`
+        html, body { height: 100%; overflow: auto; }
+        body { -ms-overflow-style: none; scrollbar-width: none; }
+        body::-webkit-scrollbar { display: none; }
+        .scene { position: relative; z-index: 3; min-height: 100vh; overflow: visible; }
+        .crt-overlay {
+          position: fixed; inset: 0; pointer-events: none;
+          background: radial-gradient(120% 80% at 50% 20%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0.55) 100%),
+            repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 2px, transparent 4px);
+          mix-blend-mode: overlay; z-index: 0;
+        }
+        .burn-halo {
+          position: fixed; inset: -12vh; pointer-events: none; z-index: 2; opacity: 0.42;
+          background: radial-gradient(60% 40% at 50% 88%, rgba(255,60,60,0.00) 0%, rgba(255,48,48,0.10) 32%, rgba(255,30,30,0.18) 55%, rgba(255,0,0,0.00) 72%),
+            radial-gradient(70% 55% at 50% 92%, rgba(255,140,90,0.08), transparent 70%);
+          mix-blend-mode: screen; filter: blur(14px);
+          animation: burnPulse 3.6s ease-in-out infinite, burnFlicker 780ms steps(2, end) infinite;
+        }
+        @keyframes burnPulse {
+          0%, 100% { opacity: 0.32; filter: blur(12px) hue-rotate(-6deg); }
+          50% { opacity: 0.58; filter: blur(20px) hue-rotate(-14deg); }
+        }
+        @keyframes burnFlicker {
+          0% { filter: brightness(1) drop-shadow(0 0 0 rgba(255,80,80,0)); }
+          50% { filter: brightness(1.06) drop-shadow(0 0 10px rgba(255,80,80,0.10)); }
+          100% { filter: brightness(1) drop-shadow(0 0 0 rgba(255,80,80,0)); }
+        }
+        .softglow { text-shadow: 0 0 6px rgba(34,255,0,0.6); }
+        .glow-text { color: #ffd0d6; text-shadow: 0 0 6px #ffd0d6, 0 0 12px #ff6688, 0 0 24px #ff2255; }
+        .ember { position: absolute; bottom: 24%; width: 3px; height: 3px; border-radius: 50%; background: #22ff88; box-shadow: 0 0 8px rgba(34,255,136,0.8); }
+        .t-track { animation: marquee var(--marquee-time, 24s) linear infinite; }
+        @keyframes marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(calc(-1 * var(--marquee-width, 1000px))); }
+        }
+      `}</style>
     </main>
   );
 }
