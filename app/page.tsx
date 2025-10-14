@@ -636,7 +636,7 @@ tx_in => supply_out => price_up`}
                           X: @DeadloopLabs
                         </a>
                       </span>
-                      <span className="terminal text-[#ff0044]">Clanker: TBC</span>
+                      <span className="terminal text-[#ff0044]">Clanker: 0x30B7e85C723d5Fb90CCE208063e0ECbf3eA29b07</span>
                       <span className="terminal">
                         <a
                           href="https://farcaster.xyz/deadloopprotocol"
@@ -647,7 +647,7 @@ tx_in => supply_out => price_up`}
                           Farcaster: deadloopprotocol
                         </a>
                       </span>
-                      <span className="terminal text-[#ff0044]">Dex: TBC</span>
+                      <span className="terminal text-[#ff0044]">Dex: https://dexscreener.com/base/0x16f61c0c9ef515c3739bc8eeaa5fb058c7bf12040cded6c9b9c699ad0fb1a087</span>
                     </span>
                   </div>
 
