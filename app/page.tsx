@@ -4,6 +4,10 @@ import React, { useEffect, useMemo, useRef, useState, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import useSWR from "swr";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 /* helpers */
