@@ -1,6 +1,6 @@
 export const metadata = {
   title: "DEADLOOP // Terminal",
-  description: "Recursive buyback engine — LIVE burn dashboard",
+  description: "Recursive burn engine — LIVE burn dashboard",
 };
 
 import "./globals.css";

@@ -7,8 +7,8 @@ export const revalidate = 0;
 
 export async function GET() {
     const burns = await prisma.burn.findMany({
-        orderBy: { timestamp: "desc" },
-        take: 200, // adjust as you like
+        orderBy: { timestamp: "desc" }, // shows newest first
+        take: 200,                      // bump if you need more
     });
 
     // Prisma Decimal -> string for JSON
