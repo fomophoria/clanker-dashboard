@@ -463,7 +463,8 @@ export default function Page() {
     animateNumber({ from: bbAmt, to: targetCount, ms: 500, onUpdate: (v) => setBbAmt(Math.round(v)) });
   }, [stats?.count]);
 
-  const recentList = Array.isArray(recent?.items) ? recent.items : [];
+  const recentList = Array.isArray(recent?.burns) ? recent.burns : [];
+
 
 
   return (
