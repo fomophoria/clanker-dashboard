@@ -1,24 +1,27 @@
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 import { NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+const TOTAL_SUPPLY = 1_000_000_000; // or your actual total
 
 export async function GET() {
-  const count = await prisma.burn.count();
-  const totalBurned = await prisma.burn.aggregate({
-    _sum: { amountHuman: true },
-  });
+  try {
+    const burns = await prisma.burn.findMany();
+    const totalBurned = burns.reduce((sum, b) => sum + Number(b.amountHuman || 0), 0);
+    const remainingSupply = TOTAL_SUPPLY - totalBurned;
+    const percentBurned = (totalBurned / TOTAL_SUPPLY) * 100;
 
-  const totalSupply = 100_000_000_000; // adjust if needed
-  const burned = Number(totalBurned._sum.amountHuman || 0);
-  const percentBurned = (burned / totalSupply) * 100;
-  const remainingSupply = totalSupply - burned;
-
-  return NextResponse.json({
-    count,
-    percentBurned,
-    remainingSupply,
-  });
+    return NextResponse.json({
+      totalBurned,
+      remainingSupply,
+      percentBurned,
+      count: burns.length,
+    });
+  } catch (err) {
+    console.error("Error fetching stats:", err);
+    return NextResponse.json({ error: "Failed to fetch stats" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
+  }
 }
