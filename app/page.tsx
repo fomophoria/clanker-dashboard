@@ -466,7 +466,6 @@ export default function Page() {
   const recentList = Array.isArray(recent?.burns) ? recent.burns : [];
 
 
-
   return (
     <main className="scene">
       <div className="crt-overlay" aria-hidden />

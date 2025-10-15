@@ -3,7 +3,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import { NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
+
 
 const DEAD = "0x000000000000000000000000000000000000dead";
 const TOKEN = process.env.TOKEN_ADDRESS?.toLowerCase();
